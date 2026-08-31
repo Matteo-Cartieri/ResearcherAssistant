@@ -1,0 +1,25 @@
+[project]
+name = "progetto"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ag-ui-protocol>=0.1.19",
+    "agno>=2.6.20",
+    "arxiv>=4.0.0",
+    "autopep8>=2.3.2",
+    "black>=26.5.1",
+    "deepseek>=1.0.0",
+    "fastapi[standard]>=0.138.2",
+    "google-genai>=2.10.0",
+    "groq>=1.5.0",
+    "jsonpatch>=1.33",
+    "lancedb>=0.34.0",
+    "mistralai>=2.9.4",
+    "openai>=3.6.0",
+    "pypdf>=6.14.2",
+    "sqlalchemy>=2.0.51",
+    "torch>=2.13.0",
+    "uvicorn>=0.49.0",
+]

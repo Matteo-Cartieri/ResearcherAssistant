@@ -1,0 +1,33 @@
+@import "@copilotkit/react-core/v2/styles.css";
+@import "tailwindcss";
+
+.dark [data-copilotkit] {
+  --foreground: #e2e8f0;
+  --ring: transparent;              
+}
+
+.dark-chat  {
+  background-color: #0f0f0f !important; 
+}
+
+.dark-chat [data-testid="copilot-assistant-message"] {
+  background-color: #0f0f0f !important; 
+}
+
+[data-testid="copilot-user-message"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+}
+
+[data-copilotkit="true"].bg-slate-900.border-slate-800 {
+  background-color: transparent !important;
+  border-color: transparent !important;
+} 
+
+[data-copilotkit] {
+  overflow: hidden !important;
+}
