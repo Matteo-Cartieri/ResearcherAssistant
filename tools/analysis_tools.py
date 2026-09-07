@@ -3,6 +3,8 @@ import os
 from pydantic import BaseModel, Field
 from agno.tools import tool
 from agents.shared import knowledge, current_user_id
+from pathlib import Path
+from agno.knowledge.reader.pdf_reader import PDFReader
 
 INTERNAL_API_TOKEN = os.environ["INTERNAL_API_TOKEN"] 
 
@@ -94,11 +96,10 @@ def get_user_workplan() -> str:
     )
 
 @tool
-def search_user_papers(query: str) -> str:
+def search_user_knowledge(query: str) -> str:
     """
     Search the current logged-in user's own indexed papers in the knowledge base.
-    Use this whenever you need content from papers the user has previously indexed
-    (e.g. to summarize, compare, or answer questions about them).
+    Use this when the user wants to find information within their own papers.
 
     Args:
         query: What to search for inside the user's papers.
@@ -119,3 +120,73 @@ def search_user_papers(query: str) -> str:
         chunks.append(f"[paper_id: {paper_id}]\n{doc.content}")
 
     return "\n\n---\n\n".join(chunks)
+
+@tool
+def search_user_paper_ids(query: str) -> str:
+    """
+    Search the current logged-in user's own indexed papers and return the
+    matching paper_id(s), ranked by relevance. Use this to locate which paper
+    a user is referring to (e.g. by title or topic) BEFORE calling get_full_text_from_paper.
+    Use this when the user wants a summary or a comparison regarding a specific paper.
+
+    Args:
+        query: Title, keywords, or topic to match against the user's papers.
+    Returns:
+        A formatted list of candidate paper_ids with their titles, or a
+        message indicating no matches were found.
+    """
+    user_id = current_user_id.get()
+    if not user_id:
+        return "No authenticated user found in this session; cannot search the knowledge base."
+
+    # search the knowledge base for the user's indexed papers
+    results = knowledge.search(query=query, filters={"user_id": user_id})
+
+    if not results:
+        return "No matching papers found in this user's indexed knowledge base."
+
+    seen = {}
+    for doc in results:
+        paper_id = doc.meta_data.get("paper_id")
+        if not paper_id or paper_id in seen:
+            continue
+        title = doc.meta_data.get("title", "unknown title")
+        seen[paper_id] = title
+
+    if not seen:
+        return "Matches found but no paper_id metadata attached; cannot resolve filenames."
+
+    lines = [f"- paper_id: {pid} | title: {title}" for pid, title in seen.items()]
+    return "Candidate papers (best match first):\n" + "\n".join(lines)
+
+@tool
+def get_full_text_from_paper(paper_id: str) -> dict:
+    """
+    Extract the full text of a PDF paper from the local knowledge base without splitting 
+    it into chunks, given its paper_id (papers are stored at docs/<paper_id>.pdf).
+    Use this when the user wants a summary or a comparison regarding a specific paper.
+
+    Args:
+        paper_id: The ID of the paper for which to extract text.
+    Returns:
+        dict: {"success": bool, "text": str|None, "error": str|None}
+    """
+    path = Path("docs") / f"{paper_id}.pdf"
+    if not path.exists():
+        return {"success": False, "text": None, "error": f"File not found: {path}"}
+
+    reader = PDFReader(chunk=False) 
+    try:
+        documents = reader.read(str(path))
+    except Exception as e:
+        return {"success": False, "text": None, "error": f"Extraction failed: {e}"}
+
+    if not documents:
+        return {"success": False, "text": None, "error": "Reader returned empty list (corrupted or unreadable PDF)."}
+
+    full_text = "\n".join(doc.content for doc in documents if getattr(doc, "content", None))
+
+    if not full_text.strip():
+        return {"success": False, "text": None, "error": "No extractable text."}
+
+    return {"success": True, "text": full_text, "error": None}

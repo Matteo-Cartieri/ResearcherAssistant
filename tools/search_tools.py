@@ -141,7 +141,7 @@ def get_researcher_profile() -> str:
     user_id = current_user_id.get()
 
     if not user_id:
-        return ("No authenticated user found .")
+        return ("No authenticated user found.")
 
     # Make a GET request to the internal API to retrieve the researcher profile
     response = requests.get(
