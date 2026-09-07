@@ -79,22 +79,22 @@ analysis_agent_cases = [
 ]
 
 simulation_agent_cases = [
-    # Case(
-    #     name="simulation_extract_and_execute_code", 
-    #     agent="simulation_agent",
-    #     input="Estrai ed esegui il codice presente nell'articolo 'Direct Preference Optimization'.", 
-    #     expected_tool_calls=["search_user_paper_ids", "get_full_text_from_paper", "get_runnable_functions", "run_code"], 
-    #     criteria="L'agente deve estrarre il codice Python eseguibile dal'articolo e tentare di eseguirlo. La risposta deve riportare chiaramente il risultato dell'esecuzione. Se l'agente ha inventato i dati passati in argomento alla funzione rilevata, deve comunicarli.", 
-    #     tags=["simulation", "code_extraction", "code_execution"]
-    # ),
-    # Case(
-    #     name="simulation_paper_without_code", 
-    #     agent="simulation_agent",
-    #     input="Estrai ed esegui il codice presente nell'articolo 'Fine-Tuning Language Models from Human Preferences'.", 
-    #     expected_tool_calls=["search_user_paper_ids", "get_full_text_from_paper", "get_runnable_functions"], 
-    #     criteria="L'agente deve verificare la presenza di codice Python eseguibile. Poichè non è presente codice Python eseguibile, deve comunicarlo chiaramente e non deve inventare codice.", 
-    #     tags=["simulation", "code_extraction", "negative_case"]
-    # ),
+    Case(
+        name="simulation_extract_and_execute_code", 
+        agent="simulation_agent",
+        input="Estrai ed esegui il codice presente nell'articolo 'Direct Preference Optimization'.", 
+        expected_tool_calls=["search_user_paper_ids", "get_full_text_from_paper", "get_runnable_functions", "run_code"], 
+        criteria="L'agente deve estrarre il codice Python eseguibile dal'articolo e tentare di eseguirlo. La risposta deve riportare chiaramente il risultato dell'esecuzione. Se l'agente ha inventato i dati passati in argomento alla funzione rilevata, deve comunicarli.", 
+        tags=["simulation", "code_extraction", "code_execution"]
+    ),
+    Case(
+        name="simulation_paper_without_code", 
+        agent="simulation_agent",
+        input="Estrai ed esegui il codice presente nell'articolo 'Fine-Tuning Language Models from Human Preferences'.", 
+        expected_tool_calls=["search_user_paper_ids", "get_full_text_from_paper", "get_runnable_functions"], 
+        criteria="L'agente deve verificare la presenza di codice Python eseguibile. Poichè non è presente codice Python eseguibile, deve comunicarlo chiaramente e non deve inventare codice.", 
+        tags=["simulation", "code_extraction", "negative_case"]
+    ),
     Case(
         name="simulation_missing_dependencies", 
         agent="simulation_agent",
